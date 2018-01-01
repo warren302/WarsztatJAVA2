@@ -23,35 +23,35 @@ public class MainApp {
 		int userId = 0;
 		try {
 			userId = Integer.parseInt(args[0]);
+			try (Connection conn = DriverManager.getConnection(conCommand, dbUser, password)) {
+				User user = User.loadById(conn, userId);
+				UserDisplayUtils.display(user);
+				boolean isExit = false;
+				while (!isExit) {
+					String command = mainMenu(menulines);
+					switch (command) {
+						case "add"	:	addSolution(conn, userId);	
+										break;
+						
+						case "view"	:	viewSolutions(conn, userId);
+										break;
+						
+						case "quit" :	isExit = true;
+										break;
+					
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			scanner.close();
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.out.println("Brak wymaganego parametru (user id)");
 			e.printStackTrace();
-		} catch (NullPointerException e){
+		} catch (NumberFormatException e){
 			System.out.println("Wymagany parametr typu int");
 			e.printStackTrace();
-		}
-		try (Connection conn = DriverManager.getConnection(conCommand, dbUser, password)) {
-			boolean isExit = false;
-			while (!isExit) {
-				String command = mainMenu(menulines);
-				switch (command) {
-					case "add"	:	addSolution(conn, userId);	
-									break;
-					
-					case "view"	:	viewSolutions(conn, userId);
-									break;
-					
-					case "quit" :	isExit = true;
-									break;
-				
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		
-		scanner.close();
+		} 
 	}
 
 	
